@@ -27,7 +27,9 @@ public class Scraper1337 {
 
             System.out.println("Starting Navigation Link scraping from: " + url);
             scrapeNavLinks(doc);
-            System.out.println("Navigation Link scraping completed !! ");
+
+            System.out.println("Starting Job Link scraping from: " + url);
+            scrapeJobLinks(doc);
 
             // If any IO error, write to the console
         } catch (IOException e) {
@@ -51,6 +53,23 @@ public class Scraper1337 {
         }
         System.out.println("Successfully extracted " + trettonLinks.size() + " navigation Links.");
         writeToCsv(trettonLinks, "NavLinks.csv");
+    }
+
+    public static void scrapeJobLinks(Document doc){
+        List<TrettonLinks> trettonJobLinks = new ArrayList<>();
+        trettonJobLinks.add(new TrettonLinks("Job Title", "Job URL"));
+
+        Elements jobItems = doc.getElementsByTag("span");
+        for(Element jobItem: jobItems){
+            Elements jobLinks = jobItem.getElementsByTag("a");
+            String jobLinkUrl = jobLinks.attr("abs:href");
+            if(jobLinkUrl.length() > 0){
+                System.out.println(jobItem.text() + " : " + jobLinkUrl);
+                trettonJobLinks.add(new TrettonLinks(jobItem.text(), jobLinkUrl));
+            }
+        }
+        System.out.println("Successfully extracted " + trettonJobLinks.size() + " job Links.");
+        writeToCsv(trettonJobLinks, "JobLinks.csv");
     }
 
     public static void writeToCsv(List<TrettonLinks> extractedList, String fileName){
