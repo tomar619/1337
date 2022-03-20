@@ -1,15 +1,19 @@
 package com.tom;
 
+import com.opencsv.CSVWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Scraper1337 {
+
+    private static String filePath = "c:\\Training\\Tretton37\\1337\\ScrapedFiles\\";
 
     public static void main(String[] args) {
         String url = "https://tretton37.com";
@@ -46,6 +50,20 @@ public class Scraper1337 {
                 trettonLinks.add(new TrettonLinks(linkItems.text(), linkItemUrl));
         }
         System.out.println("Successfully extracted " + trettonLinks.size() + " navigation Links.");
+        writeToCsv(trettonLinks, "NavLinks.csv");
+    }
+
+    public static void writeToCsv(List<TrettonLinks> extractedList, String fileName){
+        System.out.println("Trying to write extracted data in file: " + fileName);
+        try (CSVWriter trettonLinkWriter = new CSVWriter(new FileWriter(filePath + fileName))) {
+            for(TrettonLinks extractedListItem: extractedList){
+                trettonLinkWriter.writeNext(new String[] {extractedListItem.getLinkTitle(), extractedListItem.getLinkUrl()}, false);
+            }
+            System.out.println("Successfully added extracted data in file: " + fileName);
+        } catch (IOException e) {
+            System.out.println("Writing data to csv failed: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 }
