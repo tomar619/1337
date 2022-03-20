@@ -25,11 +25,14 @@ public class Scraper1337 {
             // Get the document title JSoup's title() method
             System.out.printf("Website Title: %s\n", doc.title());
 
-            System.out.println("Starting Navigation Link scraping from: " + url);
+            /*System.out.println("Starting Navigation Link scraping from: " + url);
             scrapeNavLinks(doc);
 
             System.out.println("Starting Job Link scraping from: " + url);
-            scrapeJobLinks(doc);
+            scrapeJobLinks(doc);*/
+
+            System.out.println("Starting Social Link scraping from: " + url);
+            scrapeSocialLinks(doc);
 
             // If any IO error, write to the console
         } catch (IOException e) {
@@ -70,6 +73,29 @@ public class Scraper1337 {
         }
         System.out.println("Successfully extracted " + trettonJobLinks.size() + " job Links.");
         writeToCsv(trettonJobLinks, "JobLinks.csv");
+    }
+
+    public static void scrapeSocialLinks(Document doc){
+        List<TrettonLinks> trettonSocialLinks = new ArrayList<>();
+        trettonSocialLinks.add(new TrettonLinks("Social Platform", "Social URL"));
+
+        Elements socialLinkItems = doc.getElementsByTag("aside");
+        System.out.println(socialLinkItems.size());
+        for(Element socialLinkItem: socialLinkItems){
+            Elements socialLinks = socialLinkItem.getElementsByTag("a");
+
+            for(Element socialLink: socialLinks){
+                String socialUrlClass = socialLink.attr("class");
+                String socialUrl = socialLink.attr("abs:href");
+                if(socialUrl.length() > 0) {
+                    String platform = socialUrlClass.substring(socialUrlClass.indexOf("-") + 1, socialUrlClass.indexOf(" "));
+                    System.out.println(platform + " : " + socialUrl);
+                    trettonSocialLinks.add(new TrettonLinks(platform, socialUrl));
+                }
+            }
+        }
+        System.out.println("Successfully extracted " + trettonSocialLinks.size() + " social Links.");
+        writeToCsv(trettonSocialLinks, "SocialLinks.csv");
     }
 
     public static void writeToCsv(List<TrettonLinks> extractedList, String fileName){
